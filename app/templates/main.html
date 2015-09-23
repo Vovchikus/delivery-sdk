@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<p>{{ get_flashed_messages() }}</p>
+<div><a href="/init">Initialization</a></div>
+<hr>
+<div><a href="/createOrder">Create Order</a></div>
+<div><a href="/searchDeliveryList">Search Delivery List</a></div>
+<hr>
+<h3>Method keys</h3>
+{{method_keys}}
+<h3>Resource settings</h3>
+{{resource_settings}}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div><a href="/">Main page</a></div>
+<p>{{ get_flashed_messages() }}</p>
+{% from "_formhelpers.html" import render_field %}
+<form method=post action="/createOrder">
+    <dl>
+        {{ render_field(form.order_num) }}
+        {{ render_field(form.delivery_delivery) }}
+        {{ form.csrf_token }}
+    </dl>
+    <p><input type="Submit" value="CreateOrder">
+</form>
+
+<hr>
+{{create_order}}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% block content %}
+<div><a href="/">Main page</a></div>
+<p>{{ get_flashed_messages() }}</p>
+{% from "_formhelpers.html" import render_field %}
+<form method=post action="/init">
+    <dl>
+        {{ render_field(form.method_keys) }}
+        {{ render_field(form.resource_settings) }}
+        {{ form.csrf_token }}
+    </dl>
+    <p><input type="Submit" value="Save registration data">
+</form>
+{% endblock %}
