@@ -4,14 +4,92 @@
 <p>{{ get_flashed_messages() }}</p>
 {% from "_formhelpers.html" import render_field %}
 <form method=post action="/createOrder">
-    <dl>
+<div class="field-row">
         {{ render_field(form.order_num) }}
-        {{ render_field(form.delivery_delivery) }}
+        {{ render_field(form.order_weight) }}
+        {{ render_field(form.order_length) }}
+        {{ render_field(form.order_width) }}
+        {{ render_field(form.order_height) }}
+        {{ render_field(form.order_requisite, class='form-control') }}
+        {{ render_field(form.order_warehouse, class='form-control') }}
+        {{ render_field(form.order_payment_method, class='form-control') }}
+        {{ render_field(form.order_assessed_value) }}
+    <hr>
+        {{ render_field(form.recipient_first_name) }}
+        {{ render_field(form.recipient_middle_name) }}
+        {{ render_field(form.recipient_last_name) }}
+        {{ render_field(form.recipient_phone) }}
+        {{ render_field(form.recipient_email) }}
+        {{ render_field(form.recipient_comment) }}
+    <hr>
+        {{ render_field(form.deliverypoint_city) }}
+        {{ render_field(form.deliverypoint_street) }}
+        {{ render_field(form.deliverypoint_house) }}
+        {{ render_field(form.deliverypoint_index) }}
         {{ form.csrf_token }}
-    </dl>
-    <p><input type="Submit" value="CreateOrder">
+    <div class="btn btn-info" id="search_delivery">Рассчитать способы доставки</div>
+    <hr>
+    <div id="delivery-list" style="display:none">
+        <div>Курьером</div><div id="courier-list"></div>
+        <div>Самовывоз</div><div id="pickup-list"></div>
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="CreateOrder"></p>
+</div>
 </form>
-
 <hr>
 {{create_order}}
+
+<script>
+    $(document).ready(function(){
+        $('#search_delivery').click(function(){
+
+            $.ajax({
+                  url: "/searchDeliveryList",
+                  data: collectData(),
+                  success: function( response ) {
+                    var result = $.parseJSON(response)
+                    console.log(result);
+                    var deliveryListElem = $("#delivery-list");
+                    var courierList = $("#courier-list");
+                    var pickupList = $("#pickup-list");
+                    courierList.empty();
+                    pickupList.empty();
+                    $.each(result.data, function(key, value){
+                        if(value.type == 'TODOOR'){
+                            var tariff = $(
+                            "<input type='radio' name='tariff' />"+
+                            "<span class='tariff-info'> Тариф " + value.delivery.name + " - " + value.tariffName + "</span><br />" +
+                            "<span>Стоимость " + value.cost + "р. </span>"
+                            );
+                            tariff.appendTo('#courier-list');
+                        }
+                        if(value.type == 'PICKUP'){
+                            $.each(value.pickupPoints, function(index, params){
+                                var pointTariff = $(
+                                "<input type='radio' name='tariff' />"+
+                                "<span class='tariff-info'> "+ value.delivery.name + " - " + params.full_address + "</span><br />" +
+                                "<span>Стоимость " + value.cost + "р. </span><br />"
+                                );
+                                pointTariff.appendTo('#pickup-list');
+                            })
+                        }
+           
+                    })
+                    deliveryListElem.show();
+                  }
+                });
+        });
+
+        function collectData(){
+            return {
+                city_from: 'Москва',
+                city_to: 'Москва',
+                length: 1,
+                weight: 1,
+                width: 1
+             }
+        }
+    })
+</script>
 {% endblock %}
+

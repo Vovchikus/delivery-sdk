@@ -4,7 +4,7 @@
 <p>{{ get_flashed_messages() }}</p>
 {% from "_formhelpers.html" import render_field %}
 <form method=post action="/searchDeliveryList">
-    <dl>
+    <div class="field-row">
         {{ render_field(form.city_from) }}
         {{ render_field(form.city_to) }}
         {{ render_field(form.weight) }}
@@ -15,8 +15,8 @@
         {{ render_field(form.assessed_value) }}
         {{ render_field(form.index_city) }}
         {{ form.csrf_token }}
-    </dl>
     <p><input type="Submit" value="SearchDeliveryList">
+    </div>
 </form>
 
 <hr>

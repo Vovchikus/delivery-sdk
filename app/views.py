@@ -34,44 +34,24 @@ def init():
 @app.route('/createOrder', methods=['GET', 'POST'])
 def create_order():
     order = file_helper.get_file_json(CREATE_ORDER_PATH) if file_helper.get_file_json(CREATE_ORDER_PATH) else '{}'
-    list_file_json = file_helper.get_file_json(SEARCH_DELIVERY_LIST_PATH)
-    if list_file_json:
-        if list_file_json['status'] == 'ok':
-            delivery_list = dict(file_helper.get_file_json(SEARCH_DELIVERY_LIST_PATH))
-        else:
-            flash("You should load SearchDeliveryList with status OK")
-            return redirect('/searchDeliveryList')
-    else:
-        flash("SearchDeliveryList data not found")
-        return redirect('/searchDeliveryList')
+    settings = file_helper.get_file_json(RESOURCE_SETTINGS_PATH)
     form = OrderForm()
-    form.delivery_delivery.choices = [
-        (l['delivery']['id'], l['delivery']['unique_name']) for l in delivery_list['data']
-        ]
+    form.order_requisite.choices = [(r, r) for r in settings['requisite_ids']]
+    form.order_warehouse.choices = [(w, w) for w in settings['warehouse_ids']]
     if form.validate_on_submit():
         file_helper.make_file(open_api_map.create_order(form.data), 'create_order', 'json', 'w+')
         flash("Order data response saved...")
         return redirect('/createOrder')
-    return render_template('create_order.html', form=form, create_order=order, delivery_list=delivery_list)
-
-
-@app.route('/searchDeliveryList', methods=['GET', 'POST'])
-def search_delivery_list():
-    search_list = file_helper.get_file_json(SEARCH_DELIVERY_LIST_PATH) if file_helper.get_file_json(
-        SEARCH_DELIVERY_LIST_PATH) else '{}'
-    settings = file_helper.get_file_json(RESOURCE_SETTINGS_PATH) and file_helper.get_file_json(METHOD_KEYS_PATH)
-    if not settings:
-        flash("You should load Initialization Settings")
-        return redirect('/init')
-    form = SearchDeliveryListForm()
-    if form.validate_on_submit():
-        file_helper.make_file(open_api_map.search_delivery_list(form.data), 'search_delivery_list', 'json', 'w+')
-        flash("SearchDeliveryList data response saved...")
-        return redirect('/searchDeliveryList')
-    return render_template('search_delivery_list.html', form=form, search_list=search_list)
+    return render_template('create_order.html', form=form, create_order=order)
 
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
     result = open_api_map.autocomplete(request.args)
+    return result
+
+
+@app.route('/searchDeliveryList', methods=['GET'])
+def search_delivery_list():
+    result = open_api_map.search_delivery_list(request.args)
     return result

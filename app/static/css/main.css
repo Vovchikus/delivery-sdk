@@ -1,0 +1,15 @@
+.required {
+    color: red;
+}
+.field-block input, .field-block select {
+    float: right;
+}
+.field-row {
+    width: 500px;
+}
+form {
+    margin-left: 30px;
+}
+.form-control {
+    width: 175px;
+}

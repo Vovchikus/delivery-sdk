@@ -1,6 +1,6 @@
 {% macro render_field(field) %}
-<dt>{{ field.label }}
-<dd>{{ field(**kwargs)|safe }}
+<div class="field-block"> {% if field.flags.required %} {{ field.label(class_='required') }} {% else %} {{ field.label }} {% endif %}
+{{ field(**kwargs)|safe }}</div> <br/>
     {% if field.errors %}
     <ul class=errors>
         {% for error in field.errors %}
@@ -8,5 +8,4 @@
         {% endfor %}
     </ul>
     {% endif %}
-</dd>
 {% endmacro %}
