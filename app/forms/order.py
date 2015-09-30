@@ -1,5 +1,7 @@
 from flask_wtf import Form
-from wtforms import StringField, SelectField, validators
+from wtforms import StringField, SelectField, BooleanField, FormField, FieldList, validators
+from order_item import OrderItemsForm
+
 
 
 class OrderForm(Form):
@@ -22,5 +24,13 @@ class OrderForm(Form):
     deliverypoint_street = StringField("Deliverypoint Street")
     deliverypoint_house = StringField("Deliverypoint House")
     deliverypoint_index = StringField("Deliverypoint Index")
+    delivery_delivery = StringField("Delivery ID")
+    delivery_direction = StringField("Delivery Direction ID")
+    delivery_pickuppoint = StringField("Delivery Pickuppoint ID")
+    delivery_tariff = StringField("Delivery Tariff ID")
+    to_yd_warehouse = BooleanField("Use YD Warehouse")
+    is_manual_delivery_cost = BooleanField("Use Custom Delivery Cost")
+    order_items = FieldList(FormField(OrderItemsForm), min_entries=1)
+
 
 

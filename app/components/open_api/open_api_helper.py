@@ -2,7 +2,7 @@ from app.components import file_helper
 import json
 from pprint import pprint
 
-DELIVERY_URL = 'https://delivery.yandex.ru/api/'
+DELIVERY_URL = 'https://delivery.yandex.ru/api/last/'
 METHOD_KEYS_PATH = 'method_keys.json'
 RESOURCE_SETTINGS_PATH = 'resource_settings.json'
 

@@ -1,6 +1,6 @@
 from flask import render_template, redirect, flash, request
 from app import app
-from forms import InitializationForm, OrderForm, SearchDeliveryListForm
+from forms import InitializationForm, OrderForm
 from components import file_helper
 from components.open_api.open_api_helper import RESOURCE_SETTINGS_PATH, METHOD_KEYS_PATH, validate_initialization_data
 from components.open_api.open_api_map import CREATE_ORDER_PATH, SEARCH_DELIVERY_LIST_PATH

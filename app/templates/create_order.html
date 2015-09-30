@@ -26,11 +26,21 @@
         {{ render_field(form.deliverypoint_street) }}
         {{ render_field(form.deliverypoint_house) }}
         {{ render_field(form.deliverypoint_index) }}
+    <hr>
+        {{ render_field(form.delivery_delivery) }}
+        {{ render_field(form.delivery_direction) }}
+        {{ render_field(form.delivery_pickuppoint) }}
+        {{ render_field(form.to_yd_warehouse) }}
+        {{ render_field(form.is_manual_delivery_cost) }}
+
+        {{ render_field(form.order_items) }}
+
         {{ form.csrf_token }}
+
     <div class="btn btn-info" id="search_delivery">Рассчитать способы доставки</div>
     <hr>
     <div id="delivery-list" style="display:none">
-        <div>Курьером</div><div id="courier-list"></div>
+        <div>Курьером</div><div id="courier-list"></div><br />
         <div>Самовывоз</div><div id="pickup-list"></div>
     </div>
     <p><input type="submit" class="btn btn-primary" value="CreateOrder"></p>
@@ -49,7 +59,7 @@
                   success: function( response ) {
                     var result = $.parseJSON(response)
                     console.log(result);
-                    var deliveryListElem = $("#delivery-list");
+                    var deliveryList = $("#delivery-list");
                     var courierList = $("#courier-list");
                     var pickupList = $("#pickup-list");
                     courierList.empty();
@@ -75,7 +85,7 @@
                         }
            
                     })
-                    deliveryListElem.show();
+                    deliveryList.show();
                   }
                 });
         });
