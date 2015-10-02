@@ -1,5 +1,6 @@
 import requests
 import open_api_helper
+import pdb
 
 CREATE_ORDER_PATH = 'create_order.json'
 SEARCH_DELIVERY_LIST_PATH = 'search_delivery_list.json'
@@ -23,3 +24,8 @@ def search_delivery_list(data):
 def autocomplete(data):
     r = init_request(data, 'autocomplete')
     return r.text
+
+
+def get_index(data):
+	r = init_request(data, 'getIndex')
+	return r.text

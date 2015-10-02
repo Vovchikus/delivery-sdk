@@ -1,6 +1,7 @@
 from app.components import file_helper
 import json
 from pprint import pprint
+import pdb, itertools
 
 DELIVERY_URL = 'https://delivery.yandex.ru/api/last/'
 METHOD_KEYS_PATH = 'method_keys.json'
@@ -35,6 +36,13 @@ def open_api_secret_key(method_key, dictionary):
 
     data = []
     for key in sorted(dictionary):
+        if isinstance (dictionary[key], bool):
+            dictionary[key] = str(int(dictionary[key]))
+
+        if isinstance (dictionary[key], list):
+            for item in dictionary[key]:
+                dictionary[key] = item
+
         if not isinstance(dictionary[key], dict):
             url = dictionary[key].encode('utf-8')
             data.append(urllib.unquote_plus(url))
@@ -50,7 +58,7 @@ def open_api_secret_key(method_key, dictionary):
                         if not isinstance(dictionary[key][subkey][subsubkey], dict):
                             url = dictionary[key][subkey][subsubkey].encode('utf-8')
                             data.append(urllib.unquote_plus(url))
-                            # print "subsubkey: %s: %s" % (key, dictary[key][subkey][subsubkey])
+                            # print "subsubkey: %s: %s" % (key, dictary[key][subkey][subsubkey])                        
 
     data.append(method_key.encode('utf-8'))
     data = list(data)

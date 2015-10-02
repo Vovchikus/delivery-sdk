@@ -6,6 +6,7 @@ from components.open_api.open_api_helper import RESOURCE_SETTINGS_PATH, METHOD_K
 from components.open_api.open_api_map import CREATE_ORDER_PATH, SEARCH_DELIVERY_LIST_PATH
 from components.open_api import open_api_map
 from pprint import pprint
+import pdb
 
 
 @app.route('/')
@@ -54,4 +55,16 @@ def autocomplete():
 @app.route('/searchDeliveryList', methods=['GET'])
 def search_delivery_list():
     result = open_api_map.search_delivery_list(request.args)
+    return result
+
+
+@app.route('/getIndex', methods=['GET'])
+def get_index():
+    result = open_api_map.get_index(request.args)
+    return result
+
+
+@app.route('/createOrderJson', methods=['GET', 'POST'])
+def create_order_json():
+    result = open_api_map.create_order(request.args)
     return result

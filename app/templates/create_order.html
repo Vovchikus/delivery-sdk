@@ -3,6 +3,7 @@
 <div><a href="/">Main page</a></div>
 <p>{{ get_flashed_messages() }}</p>
 {% from "_formhelpers.html" import render_field %}
+<div id="fill-data" class="btn btn-info">Fill with data</div>
 <form method=post action="/createOrder">
 <div class="field-row">
         {{ render_field(form.order_num) }}
@@ -26,18 +27,23 @@
         {{ render_field(form.deliverypoint_street) }}
         {{ render_field(form.deliverypoint_house) }}
         {{ render_field(form.deliverypoint_index) }}
+
+        {{ render_field(form.to_yd_warehouse) }}
+        {{ render_field(form.is_manual_delivery_cost) }}
     <hr>
+        <h5>Заполняется автоматически при выборе способа доставки</h5>
         {{ render_field(form.delivery_delivery) }}
         {{ render_field(form.delivery_direction) }}
         {{ render_field(form.delivery_pickuppoint) }}
-        {{ render_field(form.to_yd_warehouse) }}
-        {{ render_field(form.is_manual_delivery_cost) }}
-
-        {{ render_field(form.order_items) }}
-
+        {{ render_field(form.delivery_tariff) }}
+    <hr>
+        
         {{ form.csrf_token }}
 
     <div class="btn btn-info" id="search_delivery">Рассчитать способы доставки</div>
+
+    <div class="btn btn-info" id="create-order">Создать заказ</div>
+
     <hr>
     <div id="delivery-list" style="display:none">
         <div>Курьером</div><div id="courier-list"></div><br />
@@ -51,8 +57,19 @@
 
 <script>
     $(document).ready(function(){
-        $('#search_delivery').click(function(){
 
+        $('#create-order').click(function(){
+          $.ajax({
+          url: "/createOrderJson",
+          data: $( "form" ).serialize(),
+          success: function( data ) {
+            console.log(data);
+          }
+        });
+        })
+
+
+        $('#search_delivery').click(function(){
             $.ajax({
                   url: "/searchDeliveryList",
                   data: collectData(),
@@ -65,18 +82,22 @@
                     courierList.empty();
                     pickupList.empty();
                     $.each(result.data, function(key, value){
+                        deliveryData = {deliveryID: value.delivery.id, deliveryTariffID: value.tariffId, directionId: value.direction};
                         if(value.type == 'TODOOR'){
+                            deliveryData.type = 'TODOOR';
                             var tariff = $(
-                            "<input type='radio' name='tariff' />"+
+                            "<input data-delivery-item="+JSON.stringify(deliveryData)+" type='radio' name='tariff' onclick='triggerInputClick(this)'/>"+
                             "<span class='tariff-info'> Тариф " + value.delivery.name + " - " + value.tariffName + "</span><br />" +
                             "<span>Стоимость " + value.cost + "р. </span>"
                             );
                             tariff.appendTo('#courier-list');
                         }
-                        if(value.type == 'PICKUP'){
+                        if(value.type == 'PICKUP'){                        
                             $.each(value.pickupPoints, function(index, params){
+                                deliveryData.type = 'PICKUP';
+                                deliveryData.pickuppointID = params.id;
                                 var pointTariff = $(
-                                "<input type='radio' name='tariff' />"+
+                                "<input data-delivery-item="+JSON.stringify(deliveryData)+" type='radio' name='tariff' onclick='triggerInputClick(this)'/>"+
                                 "<span class='tariff-info'> "+ value.delivery.name + " - " + params.full_address + "</span><br />" +
                                 "<span>Стоимость " + value.cost + "р. </span><br />"
                                 );
@@ -90,16 +111,117 @@
                 });
         });
 
-        function collectData(){
-            return {
-                city_from: 'Москва',
-                city_to: 'Москва',
-                length: 1,
-                weight: 1,
-                width: 1
-             }
-        }
+        $('#fill-data').click(function(){
+            $('#order_num').val(Math.floor(Math.random()*(99999-1+1)+1));
+            $('#order_weight').val(2);
+            $('#order_length').val(50);
+            $('#order_width').val(50);
+            $('#order_height').val(50);
+            $('#order_assessed_value').val(1000);
+            $('#order_items-0-orderitem_article').val(Math.floor(Math.random()*(99999-1+1)+1));
+            $('#order_items-0-orderitem_name').val('Apple iPhone 6S');
+            $('#order_items-0-orderitem_cost').val(2500);
+            $('#order_items-0-orderitem_quantity').val(1);
+            $('#recipient_first_name').val('Timothy');
+            $('#recipient_middle_name').val('Donald');
+            $('#recipient_last_name').val('Cook');
+            $('#recipient_phone').val('+79266666666');
+            $('#recipient_email').val('tim@apple.com');
+            $('#recipient_comment').val('Test order from github');
+
+            $('#deliverypoint_city').val('Москва');
+            $('#deliverypoint_street').val('Новокузнецкая');
+            $('#deliverypoint_house').val('1');
+            $('#deliverypoint_index').val('111111');
+        })
+
     })
+
+    $('input[name=deliverypoint_city]').autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          url: "/autocomplete",
+          data: {
+            term: request.term, type: 'locality'
+          },
+          success: function( data ) {
+            var result = $.parseJSON(data)
+            response( result.data.suggestions );
+          }
+        });
+      },
+      select: function(event, ui){
+        $('#deliverypoint_street').val('');
+        $('#deliverypoint_house').val('');
+        $('#deliverypoint_index').val('');
+      },
+      minLength: 2,
+    })
+    $('input[name=deliverypoint_street]').autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          url: "/autocomplete",
+          data: {
+            term: request.term, type: 'street', locality_name: $('input[name=deliverypoint_city]').val()
+          },
+          success: function( data ) {
+            var result = $.parseJSON(data)
+            response( result.data.suggestions );
+          }
+        });
+      },
+      minLength: 2,
+    })
+    $('input[name=deliverypoint_house]').autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          url: "/autocomplete",
+          data: {
+            term: request.term, 
+            type: 'house', 
+            locality_name: $('input[name=deliverypoint_city]').val(),
+            street: $('input[name=deliverypoint_street]').val(),
+          },
+          success: function( data ) {
+            var result = $.parseJSON(data)
+            response( result.data.suggestions );
+          }
+        });
+      },
+      select: function(event, ui){
+        $.ajax({
+          url: "/getIndex",
+          data: { address: $('input[name=deliverypoint_city]').val() + ' ул. ' + $('input[name=deliverypoint_street]').val() },
+          success: function( data ) {
+            var result = $.parseJSON(data)
+            response( result.data.suggestions );
+          }
+        });
+      },
+      minLength: 1,
+    })
+
+    function collectData(){
+        return {
+            city_from: 'Москва',
+            city_to: $('input[name=deliverypoint_city]').val(),
+            length: $('input[name=order_length]').val(),
+            weight: $('input[name=order_weight]').val(),
+            width: $('input[name=order_width]').val(),
+         }
+    }
+
+    function triggerInputClick(elem){
+        var jqElem = $(elem);
+        var dataDelivery = JSON.parse(jqElem.attr('data-delivery-item'));
+        $('input[name=delivery_delivery]').val(dataDelivery.deliveryID);
+        $('input[name=delivery_direction]').val(dataDelivery.directionId);
+        $('input[name=delivery_tariff]').val(dataDelivery.deliveryTariffID);
+        $('input[name=delivery_pickuppoint]').val(dataDelivery.pickuppointID);
+        if(dataDelivery.type == 'PICKUP'){        
+            $('input[name=delivery_pickuppoint]').val(dataDelivery.pickuppointID);
+        }
+    }
 </script>
 {% endblock %}
 
