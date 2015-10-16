@@ -1,17 +1,22 @@
+import json
+import pdb
+import os.path
 from flask import render_template, redirect, flash, request
 from app import app
 from forms import InitializationForm, OrderForm
-from components import file_helper
-from components.open_api.open_api_helper import RESOURCE_SETTINGS_PATH, METHOD_KEYS_PATH, validate_initialization_data
-from components.open_api.open_api_map import CREATE_ORDER_PATH, SEARCH_DELIVERY_LIST_PATH
-from components.open_api import open_api_map
-from pprint import pprint
-import pdb
+from app.components import file_helper
+from app.components.open_api import open_api_map, open_api_helper
 
 
 @app.route('/')
 @app.route('/index')
 def index():
+    """
+    :return:
+    """
+    resource_settings = os.path.isfile(open_api_helper.RESOURCE_SETTINGS_PATH) 
+    json.load(file_helper.read_file(open_api_helper.RESOURCE_SETTINGS_PATH)) if
+    pdb.set_trace()
     resource_settings = file_helper.get_file_json(RESOURCE_SETTINGS_PATH) if file_helper.get_file_json(
         RESOURCE_SETTINGS_PATH) else '{}'
     method_keys = file_helper.get_file_json(METHOD_KEYS_PATH) if file_helper.get_file_json(METHOD_KEYS_PATH) else '{}'

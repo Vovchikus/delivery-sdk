@@ -3,7 +3,7 @@ import json
 from pprint import pprint
 import pdb, itertools
 
-DELIVERY_URL = 'https://delivery.yandex.ru/api/last/'
+DELIVERY_URL = 'https://delivery.dev.yandex.ru/api/last/'
 METHOD_KEYS_PATH = 'method_keys.json'
 RESOURCE_SETTINGS_PATH = 'resource_settings.json'
 
