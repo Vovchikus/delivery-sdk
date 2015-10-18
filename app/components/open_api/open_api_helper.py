@@ -4,16 +4,16 @@ from pprint import pprint
 import pdb, itertools
 
 DELIVERY_URL = 'https://delivery.dev.yandex.ru/api/last/'
-METHOD_KEYS_PATH = 'method_keys.json'
-RESOURCE_SETTINGS_PATH = 'resource_settings.json'
+METHOD_KEYS = 'method_keys'
+RESOURCE_SETTINGS = 'resource_settings'
 
 
 def load_method_keys():
-    return file_helper.get_file_json(METHOD_KEYS_PATH)
+    return file_helper.get_file_json(METHOD_KEYS)
 
 
 def load_resource_settings():
-    return file_helper.get_file_json(RESOURCE_SETTINGS_PATH)
+    return file_helper.get_file_json(RESOURCE_SETTINGS)
 
 
 def sign_request_data(request_data, method):

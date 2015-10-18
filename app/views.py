@@ -14,13 +14,12 @@ def index():
     """
     :return:
     """
-    resource_settings = os.path.isfile(open_api_helper.RESOURCE_SETTINGS_PATH) 
-    json.load(file_helper.read_file(open_api_helper.RESOURCE_SETTINGS_PATH)) if
-    pdb.set_trace()
-    resource_settings = file_helper.get_file_json(RESOURCE_SETTINGS_PATH) if file_helper.get_file_json(
-        RESOURCE_SETTINGS_PATH) else '{}'
-    method_keys = file_helper.get_file_json(METHOD_KEYS_PATH) if file_helper.get_file_json(METHOD_KEYS_PATH) else '{}'
-    return render_template("main.html", method_keys=method_keys, resource_settings=resource_settings)
+    resource_settings = file_helper.get_json_from_file(open_api_helper.RESOURCE_SETTINGS+'.json') if os.path.isfile(
+        open_api_helper.RESOURCE_SETTINGS+'.json') else ''
+    method_keys = file_helper.get_json_from_file(open_api_helper.METHOD_KEYS+'.json') if os.path.isfile(
+        open_api_helper.METHOD_KEYS+'.json') else ''
+
+    return render_template("main.html", resource_settings=resource_settings, method_keys=method_keys)
 
 
 @app.route('/init', methods=['GET', 'POST'])

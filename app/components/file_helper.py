@@ -1,4 +1,5 @@
 import os
+import json
 
 
 def make_file(content, file_name, file_ext, mod):
@@ -9,13 +10,13 @@ def make_file(content, file_name, file_ext, mod):
         print 'Error writing to file ' + file_name
 
 
-def read_file(name):
+def get_json_from_file(name):
     """
     :param name: str
     :return: File
     """
     try:
         with open(name) as f:
-            return f
+            return json.load(f)
     except IOError:
-        print 'Error opening file ' + name
+        print 'Error getting json from file ' + name
