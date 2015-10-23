@@ -1,6 +1,3 @@
-import json
-import pdb
-import os.path
 from flask import render_template, redirect, flash, request
 from app import app
 from forms import InitializationForm, OrderForm
@@ -12,23 +9,19 @@ from app.components.open_api import open_api_map, open_api_helper
 @app.route('/index')
 def index():
     """
-    :return:
+    :return: `Template` object
     """
-    resource_settings = file_helper.get_json_from_file(open_api_helper.RESOURCE_SETTINGS+'.json') if os.path.isfile(
-        open_api_helper.RESOURCE_SETTINGS+'.json') else ''
-    method_keys = file_helper.get_json_from_file(open_api_helper.METHOD_KEYS+'.json') if os.path.isfile(
-        open_api_helper.METHOD_KEYS+'.json') else ''
-
+    resource_settings = file_helper.get_json_from_file(open_api_helper.RESOURCE_SETTINGS)
+    method_keys = file_helper.get_json_from_file(open_api_helper.METHOD_KEYS)
     return render_template("main.html", resource_settings=resource_settings, method_keys=method_keys)
 
 
 @app.route('/init', methods=['GET', 'POST'])
 def init():
     form = InitializationForm()
+    form.resource_settings.data = file_helper.get_json_from_file(open_api_helper.RESOURCE_SETTINGS)
+    form.method_keys.data = file_helper.get_json_from_file(open_api_helper.METHOD_KEYS)
     if form.validate_on_submit():
-        if not validate_initialization_data(form.resource_settings.data, form.method_keys.data):
-            flash("Initialization data Error")
-            return redirect('/init')
         file_helper.make_file(form.method_keys.data, 'method_keys', 'json', 'w+')
         file_helper.make_file(form.resource_settings.data, 'resource_settings', 'json', 'w+')
         flash("Auth data successfully saved...")
