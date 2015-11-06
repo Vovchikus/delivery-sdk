@@ -30,6 +30,7 @@ class OrderForm(Form):
     delivery_tariff = StringField("Delivery Tariff ID")
     to_yd_warehouse = BooleanField("Use YD Warehouse")
     is_manual_delivery_cost = BooleanField("Use Custom Delivery Cost")
+    order_items = FieldList(FormField(OrderItemsForm), min_entries=1)
 
 
 

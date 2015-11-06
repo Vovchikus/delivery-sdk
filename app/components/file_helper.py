@@ -3,6 +3,13 @@ import json
 
 
 def make_file(content, file_name, file_ext, mod):
+    """
+    :param content: string
+    :param file_name: string
+    :param file_ext: string
+    :param mod: string
+    :return: void
+    """
     try:
         with open(file_name + '.' + file_ext, mod) as outfile:
             outfile.write(content)

@@ -30,6 +30,9 @@
 
         {{ render_field(form.to_yd_warehouse) }}
         {{ render_field(form.is_manual_delivery_cost) }}
+
+        {{ render_field(form.order_items) }}
+
     <hr>
         <h5>Заполняется автоматически при выборе способа доставки</h5>
         {{ render_field(form.delivery_delivery) }}
