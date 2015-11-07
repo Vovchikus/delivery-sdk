@@ -1,4 +1,3 @@
-import os
 import json
 
 
@@ -22,8 +21,6 @@ def get_json_from_file(name):
     :param name: str
     :return: File
     """
-    if os.path.isfile(name + '.json') is None:
-        return ''
     try:
         with open(name + '.json') as f:
             return json.load(f)

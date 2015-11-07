@@ -3,7 +3,6 @@ from app import app
 from forms import InitializationForm, OrderForm
 from app.components import file_helper
 from app.components.open_api import open_api_map, open_api_helper
-import pdb
 
 
 @app.route('/')
@@ -38,9 +37,10 @@ def create_order():
     form.order_requisite.choices = [(r, r) for r in settings['requisite_ids']]
     form.order_warehouse.choices = [(w, w) for w in settings['warehouse_ids']]
     if form.validate_on_submit():
-        call_api = open_api_map.create_order(form.data)
-        if call_api.status_code == 200:
-            file_helper.make_file(call_api.text, 'create_order', 'json', 'w+')
+        api = open_api_map.OpenApi(form.data)
+        create_order_api = api.create_order()
+        if create_order_api.status_code == 200:
+            file_helper.make_file(create_order_api.text, 'create_order', 'json', 'w+')
             flash("Order data response saved...")
             return redirect('/createOrder')
     return render_template('create_order.html', form=form, create_order=order)
