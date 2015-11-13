@@ -2,7 +2,7 @@ from app.components import file_helper
 
 
 class OpenApi:
-    DELIVERY_URL = 'https://delivery.yandex.ru/api/last/'
+    DELIVERY_URL = 'https://delivery.dev.yandex.ru/api/last/'
     METHOD_KEYS = 'method_keys'
     RESOURCE_SETTINGS = 'resource_settings'
 
@@ -109,3 +109,15 @@ class OpenApi:
         :return: :class:`Response <Response>` object
         """
         return self._init_request('getIndex')
+
+    def confirm_sender_orders(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('confirmSenderOrders')
+
+    def get_sender_orders(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getSenderOrders')

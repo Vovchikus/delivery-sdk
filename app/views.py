@@ -18,10 +18,19 @@ def index():
 
 @app.route('/init', methods=['GET', 'POST'])
 def init():
+    """
+    :return: `Template` object
+    """
     form = InitializationForm()
-    form.resource_settings.data = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
-    form.method_keys.data = file_helper.get_json_from_file(open_api_map.OpenApi.METHOD_KEYS)
+    exist_resource_settings = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
+    if exist_resource_settings is not None:
+        form.resource_settings.data = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
+
+    exist_method_keys = file_helper.get_json_from_file(open_api_map.OpenApi.METHOD_KEYS)
+    if exist_method_keys is not None:
+        form.method_keys.data = file_helper.get_json_from_file(open_api_map.OpenApi.METHOD_KEYS)
     if form.validate_on_submit():
+        print(form.data)
         file_helper.make_file(form.method_keys.data, 'method_keys', 'json', 'w+')
         file_helper.make_file(form.resource_settings.data, 'resource_settings', 'json', 'w+')
         flash("Auth data successfully saved...")
@@ -31,6 +40,9 @@ def init():
 
 @app.route('/createOrder', methods=['GET', 'POST'])
 def create_order():
+    """
+    :return: `Template` object
+    """
     order = file_helper.get_json_from_file('create_order') if file_helper.get_json_from_file('create_order') else ''
     settings = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
     form = OrderForm()
@@ -48,6 +60,9 @@ def create_order():
 
 @app.route('/autocomplete', methods=['GET'])
 def autocomplete():
+    """
+    :return: string
+    """
     api = open_api_map.OpenApi(request.args)
     autocomplete_api = api.autocomplete()
     if autocomplete_api.status_code == 200:
@@ -56,6 +71,9 @@ def autocomplete():
 
 @app.route('/searchDeliveryList', methods=['GET'])
 def search_delivery_list():
+    """
+    :return: string
+    """
     api = open_api_map.OpenApi(request.args)
     search_delivery_list_api = api.search_delivery_list()
     if search_delivery_list_api.status_code == 200:
@@ -64,7 +82,23 @@ def search_delivery_list():
 
 @app.route('/getIndex', methods=['GET'])
 def get_index():
+    """
+    :return: string
+    """
     api = open_api_map.OpenApi(request.args)
-    get_index_api = api.search_delivery_list()
+    get_index_api = api.get_index()
     if get_index_api.status_code == 200:
         return get_index_api.text
+
+
+@app.route('/confirmSenderOrders', methods=['GET', 'POST'])
+def confirm_sender_orders():
+    return render_template('confirm_sender_orders.html')
+
+
+@app.route('/getSenderOrders', methods=['GET', 'POST'])
+def get_sender_orders():
+    api = open_api_map.OpenApi(request.args)
+    get_sender_orders_api = api.get_sender_orders()
+    if get_sender_orders_api.status_code == 200:
+        return get_sender_orders_api.text

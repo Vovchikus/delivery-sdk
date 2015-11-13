@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div><a href="/">Main page</a></div>
+<div class="btn btn-info" id="get-sender-orders">Get Orders</div>
+<div id="orders-list"></div>
+<script>
+    $(document).ready(function(){
+        $('#get-sender-orders').click(function(){
+            $.ajax({
+                  url: "/getSenderOrders",
+                  data: {'real': 1},
+                  success: function( response ) {
+                      var result = $.parseJSON(response)
+                        console.debug('Result', result);
+                      if(result.status == 'error'){
+                        alert (JSON.stringify(result));
+                        return;
+                      }
+                      var ordersList = $("#orders-list");
+                      $.each(result.data.orders, function(key, value){
+                        var order = $("<input type='checkbox' name='order'>"+
+                                      "<span class='order-info'> Заказ № " + value.order_id + " - " + value.num + "</span>"+
+                                      "<span class='delivery-info'> Служба " + value.delivery.unique_name + "</span><br />"
+                        );
+                        order.appendTo('#orders-list');
+                      })
+
+                  }
+                });
+        });
+    });
+</script>
+{% endblock %}

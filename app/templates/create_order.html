@@ -34,7 +34,7 @@
         {{ render_field(form.order_items) }}
 
     <hr>
-        <h5>Заполняется автоматически при выборе способа доставки</h5>
+        <h5>Fill after Search Delivery List</h5>
         {{ render_field(form.delivery_delivery) }}
         {{ render_field(form.delivery_direction) }}
         {{ render_field(form.delivery_pickuppoint) }}
@@ -43,14 +43,12 @@
         
         {{ form.csrf_token }}
 
-    <div class="btn btn-info" id="search_delivery">Рассчитать способы доставки</div>
-
-    <div class="btn btn-info" id="create-order">Создать заказ</div>
+    <div class="btn btn-info" id="search_delivery">Search Delivery List</div>
 
     <hr>
     <div id="delivery-list" style="display:none">
-        <div>Курьером</div><div id="courier-list"></div><br />
-        <div>Самовывоз</div><div id="pickup-list"></div>
+        <div>Courier</div><div id="courier-list"></div><br />
+        <div>Pickup-list</div><div id="pickup-list"></div>
     </div>
     <p><input type="submit" class="btn btn-primary" value="CreateOrder"></p>
 </div>
@@ -61,16 +59,6 @@
 <script>
     $(document).ready(function(){
 
-        $('#create-order').click(function(){
-          $.ajax({
-          url: "/createOrderJson",
-          data: $( "form" ).serialize(),
-          success: function( data ) {
-            console.log(data);
-          }
-        });
-        })
-
 
         $('#search_delivery').click(function(){
             $.ajax({
@@ -78,7 +66,11 @@
                   data: collectData(),
                   success: function( response ) {
                     var result = $.parseJSON(response)
-                    console.log(result);
+                    console.debug('Result', result);
+                    if(result.status == 'error'){
+                        alert (JSON.stringify(result));
+                        return;
+                    }
                     var deliveryList = $("#delivery-list");
                     var courierList = $("#courier-list");
                     var pickupList = $("#pickup-list");
