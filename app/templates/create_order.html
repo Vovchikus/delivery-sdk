@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block styles %}
+{{super()}}
+<script src="static/api-maps.js"></script>
+{% endblock %}
 {% block content %}
 <div><a href="/">Main page</a></div>
 <p>{{ get_flashed_messages() }}</p>
@@ -50,6 +54,7 @@
         <div>Courier</div><div id="courier-list"></div><br />
         <div>Pickup-list</div><div id="pickup-list"></div>
     </div>
+    <div id="map" style="width:480px;height:280px;"></div>
     <p><input type="submit" class="btn btn-primary" value="CreateOrder"></p>
 </div>
 </form>
@@ -58,8 +63,6 @@
 
 <script>
     $(document).ready(function(){
-
-
         $('#search_delivery').click(function(){
             $.ajax({
                   url: "/searchDeliveryList",
@@ -87,17 +90,70 @@
                             );
                             tariff.appendTo('#courier-list');
                         }
-                        if(value.type == 'PICKUP'){                        
-                            $.each(value.pickupPoints, function(index, params){
-                                deliveryData.type = 'PICKUP';
-                                deliveryData.pickuppointID = params.id;
-                                var pointTariff = $(
-                                "<input data-delivery-item="+JSON.stringify(deliveryData)+" type='radio' name='tariff' onclick='triggerInputClick(this)'/>"+
-                                "<span class='tariff-info'> "+ value.delivery.name + " - " + params.full_address + "</span><br />" +
-                                "<span>Стоимость " + value.cost + "р. </span><br />"
-                                );
-                                pointTariff.appendTo('#pickup-list');
-                            })
+                        if(value.type == 'PICKUP'){      
+
+                                ymaps.ready(init);
+
+                                var groups = [];
+
+                                function init() {
+                                    var myMap = new ymaps.Map('map', {
+                                            center: [50.443705, 30.530946],
+                                            zoom: 14
+                                        }),                                
+                                        menu = $('<ul class="menu"></ul>');
+                                    for (var i = 0, l = groups.length; i < l; i++) {
+                                        createMenuGroup(groups[i]);
+                                    }
+                                    function createMenuGroup (group) {
+                                        var menuItem = $('<li><a href="#">' + group.name + '</a></li>'),
+                                            collection = new ymaps.GeoObjectCollection(null, { preset: group.style }),
+                                            submenu = $('<ul class="submenu"></ul>');
+                                        myMap.geoObjects.add(collection);
+                                        menuItem
+                                            .append(submenu)
+                                            .appendTo(menu)
+                                            .find('a')
+                                            .toggle(function () {
+                                                myMap.geoObjects.remove(collection);
+                                                submenu.hide();
+                                            }, function () {
+                                                myMap.geoObjects.add(collection);
+                                                submenu.show();
+                                            });
+                                        for (var j = 0, m = group.items.length; j < m; j++) {
+                                            createSubMenu(group.items[j], collection, submenu);
+                                        }
+                                    }
+
+                                    function createSubMenu (item, collection, submenu) {
+                                        var submenuItem = $('<li><a href="#">' + item.name + '</a></li>'),
+                                            placemark = new ymaps.Placemark(item.center, { balloonContent: item.name });
+                                        collection.add(placemark);
+                                        submenuItem
+                                            .appendTo(submenu)
+                                            .find('a')
+                                            .toggle(function () {
+                                                placemark.balloon.open();
+                                            }, function () {
+                                                placemark.balloon.close();
+                                            });
+
+                                    }
+                                    menu.appendTo($('body'));
+                                    myMap.setBounds(myMap.geoObjects.getBounds());
+                                }
+
+                            // $.each(value.pickupPoints, function(index, params){
+                            //     deliveryData.type = 'PICKUP';
+                            //     deliveryData.pickuppointID = params.id;
+                            //     var pointTariff = $(
+                            //     "<input data-delivery-item="+JSON.stringify(deliveryData)+" type='radio' name='tariff' onclick='triggerInputClick(this)'/>"+
+                            //     "<span class='tariff-info'> "+ value.delivery.name + " - " + params.full_address + "</span><br />" +
+                            //     "<span>Стоимость " + value.cost + "р. </span><br />"
+                            //     );
+                            //     pointTariff.appendTo('#pickup-list');
+                            // })
                         }
            
                     })
@@ -218,5 +274,25 @@
         }
     }
 </script>
+<style type="text/css">
+        /* Оформление меню (начало)*/
+    .menu {
+        list-style: none;
+        display: none;
+        margin: 0;
+        padding: 0;
+    }
+    .submenu {
+        list-style: none;
+
+        margin: 0 0 0 20px;
+        padding: 0;
+    }
+    .submenu li {
+        font-size: 90%;
+    }
+        /* Оформление меню (конец)*/
+</style>
+
 {% endblock %}
 

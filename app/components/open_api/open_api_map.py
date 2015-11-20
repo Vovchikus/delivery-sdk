@@ -2,7 +2,7 @@ from app.components import file_helper
 
 
 class OpenApi:
-    DELIVERY_URL = 'https://delivery.yandex.ru/api/last/'
+    DELIVERY_URL = 'https://delivery.dev.yandex.ru/api/last/'
     METHOD_KEYS = 'method_keys'
     RESOURCE_SETTINGS = 'resource_settings'
 
@@ -121,3 +121,93 @@ class OpenApi:
         :return: :class:`Response <Response>` object
         """
         return self._init_request('getSenderOrders')
+
+    def get_payment_method(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getPaymentMethods')
+
+    def get_sender_info(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getSenderInfo')
+
+    def get_warehouse_info(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getWarehouseInfo')
+
+    def get_requisite_info(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getRequisiteInfo')
+
+    def get_deliveries(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getDeliveries')
+
+    def delete_order(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('deleteOrder')
+
+    def get_intervals(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getIntervals')
+
+    def create_withdraw(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('createWithdraw')
+
+    def create_import(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('createImport')
+
+    def confirm_sender_parcels(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('confirmSenderParcels')
+
+    def get_sender_order_label(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getSenderOrderLabel')
+
+    def get_sender_parcel_docs(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getSenderParcelDocs')
+
+    def get_order_info(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getOrderInfo')
+
+    def get_sender_order_status(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getSenderOrderStatus')
+
+    def get_sender_order_statuses(self):
+        """
+        :return: :class:`Response <Response>` object
+        """
+        return self._init_request('getSenderOrderStatuses')
