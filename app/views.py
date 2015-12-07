@@ -30,7 +30,6 @@ def init():
     if exist_method_keys is not None:
         form.method_keys.data = file_helper.get_json_from_file(open_api_map.OpenApi.METHOD_KEYS)
     if form.validate_on_submit():
-        print(form.data)
         file_helper.make_file(form.method_keys.data, 'method_keys', 'json', 'w+')
         file_helper.make_file(form.resource_settings.data, 'resource_settings', 'json', 'w+')
         flash("Auth data successfully saved...")
@@ -48,6 +47,7 @@ def create_order():
     form = OrderForm()
     form.order_requisite.choices = [(r, r) for r in settings['requisite_ids']]
     form.order_warehouse.choices = [(w, w) for w in settings['warehouse_ids']]
+    form.sender_id.choices = [(w, w) for w in settings['sender_ids']]
     if form.validate_on_submit():
         api = open_api_map.OpenApi(form.data)
         create_order_api = api.create_order()

@@ -1,3 +1,7 @@
+html, body, #map {
+  width: 100%; padding: 0; margin: 0;
+  font-family: Arial;
+}
 .required {
     color: red;
 }
@@ -12,4 +16,24 @@ form {
 }
 .form-control {
     width: 175px;
+}
+
+#map {
+  height: 250px;
+}
+/* Оформление меню (начало)*/
+.menu {
+  list-style: none;
+  padding: 5px;
+
+  margin: 0;
+}
+.submenu {
+  list-style: none;
+
+  margin: 0 0 0 20px;
+  padding: 0;
+}
+.submenu li {
+  font-size: 90%;
 }

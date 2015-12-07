@@ -12,7 +12,6 @@ class OrderForm(Form):
     order_height = StringField("Order Height")
     order_requisite = SelectField("Order Requisite", coerce=str)
     order_warehouse = SelectField("Order Warehouse", coerce=str)
-    order_payment_method = SelectField("Order Payment Method", choices=[('1', 'Cash'), ('3', 'Prepay')])
     order_assessed_value = StringField("Order Assessed Value")
     recipient_first_name = StringField("Recipient First Name")
     recipient_middle_name = StringField("Recipient Middle Name")
@@ -31,6 +30,7 @@ class OrderForm(Form):
     to_yd_warehouse = BooleanField("Use YD Warehouse")
     is_manual_delivery_cost = BooleanField("Use Custom Delivery Cost")
     order_items = FieldList(FormField(OrderItemsForm), min_entries=1)
+    sender_id = SelectField("Order Sender", coerce=str)
 
 
 
