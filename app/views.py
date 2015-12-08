@@ -11,8 +11,8 @@ def index():
     """
     :return: `Template` object
     """
-    resource_settings = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
-    method_keys = file_helper.get_json_from_file(open_api_map.OpenApi.METHOD_KEYS)
+    resource_settings = file_helper.get_json_from_file('resource_settings')
+    method_keys = file_helper.get_json_from_file('method_keys')
     return render_template("main.html", resource_settings=resource_settings, method_keys=method_keys)
 
 
@@ -22,13 +22,13 @@ def init():
     :return: `Template` object
     """
     form = InitializationForm()
-    exist_resource_settings = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
+    exist_resource_settings = file_helper.get_json_from_file('resource_settings')
     if exist_resource_settings is not None:
-        form.resource_settings.data = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
+        form.resource_settings.data = file_helper.get_json_from_file('resource_settings')
 
-    exist_method_keys = file_helper.get_json_from_file(open_api_map.OpenApi.METHOD_KEYS)
+    exist_method_keys = file_helper.get_json_from_file('method_keys')
     if exist_method_keys is not None:
-        form.method_keys.data = file_helper.get_json_from_file(open_api_map.OpenApi.METHOD_KEYS)
+        form.method_keys.data = file_helper.get_json_from_file('method_keys')
     if form.validate_on_submit():
         file_helper.make_file(form.method_keys.data, 'method_keys', 'json', 'w+')
         file_helper.make_file(form.resource_settings.data, 'resource_settings', 'json', 'w+')
@@ -43,7 +43,7 @@ def create_order():
     :return: `Template` object
     """
     order = file_helper.get_json_from_file('create_order') if file_helper.get_json_from_file('create_order') else ''
-    settings = file_helper.get_json_from_file(open_api_map.OpenApi.RESOURCE_SETTINGS)
+    settings = file_helper.get_json_from_file('resource_settings')
     form = OrderForm()
     form.order_requisite.choices = [(r, r) for r in settings['requisite_ids']]
     form.order_warehouse.choices = [(w, w) for w in settings['warehouse_ids']]

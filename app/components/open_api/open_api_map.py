@@ -1,10 +1,5 @@
-from app.components import file_helper
-
-
 class OpenApi:
     DELIVERY_URL = 'https://delivery.yandex.ru/api/last/'
-    METHOD_KEYS = 'method_keys'
-    RESOURCE_SETTINGS = 'resource_settings'
 
     def __init__(self, request_data):
         self.reformatted_data = self._reformat_request_data(request_data)
@@ -59,14 +54,28 @@ class OpenApi:
         m.update(data_stringify)
         return m.hexdigest()
 
+    @staticmethod
+    def _get_file_contents_json(filename):
+        import json
+        try:
+            with open(filename) as f:
+                j = json.load(f)
+        except IOError as e:
+            print "Error: {0}".format(e.strerror)
+        except TypeError:
+            print "Error loading json from file"
+        else:
+            f.close()
+            return j
+
     def _sign_request_data(self, reformatted, method):
         """
         :param reformatted: dict
         :param method: string
         :return: dict
         """
-        method_keys = file_helper.get_json_from_file(self.METHOD_KEYS)
-        resource_settings = file_helper.get_json_from_file(self.RESOURCE_SETTINGS)
+        method_keys = self._get_file_contents_json('method_keys.json')
+        resource_settings = self._get_file_contents_json('resource_settings.json')
         config_data = {
             'client_id': str(resource_settings['client_id']),
             'sender_id': str(resource_settings['sender_ids'][0]),
@@ -85,6 +94,8 @@ class OpenApi:
         import requests
         data = self._sign_request_data(self.reformatted_data, method)
         return requests.post(self.DELIVERY_URL + method, data, verify=False)
+
+
 
     def create_order(self):
         """
