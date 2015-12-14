@@ -1,130 +1,160 @@
-function deliveryListHandler (response) {
-  var result = $.parseJSON(response)
-  console.debug('Result', result);
-  if (result.status == 'error') {
-    alert(JSON.stringify(result));
-    return;
-  }
-  var deliveryList = $("#delivery-list");
-  var courierList = $("#courier-list");
-  var pickupList = $("#pickup-list");
-  courierList.empty();
-  pickupList.empty();
+var DeliveryHandler = DeliveryHandler || {};
 
-  var groups = [];
-
-  $.each(result.data, function (key, value) {
-    var deliveryData = {
-      deliveryID: value.delivery.id,
-      deliveryTariffID: value.tariffId,
-      directionId: value.direction
-    };
-    if (value.type == 'TODOOR') {
-      deliveryData.type = 'TODOOR';
-      var tariff = $(
-        "<input data-delivery-item=" + JSON.stringify(deliveryData) +
-        " type='radio' name='tariff' onclick='triggerInputClick(this)'/>" +
-        "<span class='tariff-info'> Тариф " + value.delivery.name + " - " + value.tariffName +
-        "</span><br />" +
-        "<span>Стоимость " + value.cost + "р. </span>"
-      );
-      tariff.appendTo('#courier-list');
-    }
-    if (value.type == 'PICKUP') {
-      var ppGroup = {};
-      ppGroup.name = value.delivery.name;
-      ppGroup.style = "twirl#greenIcon";
-      var items = [];
-      $.each(value.pickupPoints, function (index, stat) {
-        stat.center = [
-          stat.lat,
-          stat.lng
-        ];
-        items.push(stat);
-      })
-      ppGroup.items = items;
-      groups.push(ppGroup);
+DeliveryHandler.addListener = {
+  icons: [
+    'twirl#blueIcon',
+    'twirl#greenIcon',
+    'twirl#redIcon'
+  ],
+  deliveryType: {
+    courier: 'TODOOR',
+    pickup: 'PICKUP',
+    post: 'POST'
+  },
+  menuGroup: null,
+  map: null,
+  processResponse: function (response) {
+    var parsedResponse = $.parseJSON(response);
+    if (parsedResponse.status == 'error') {
+      alert(JSON.stringify(parsedResponse));
+      return;
     }
 
-    if (value.type == 'POST') {
-      var postGroup = {};
-      postGroup.name = value.delivery.name;
-      postGroup.style = "twirl#redIcon";
-      var items = [];
-      $.each(value.pickupPoints, function (index, stat) {
-        stat.center = [
-          stat.lat,
-          stat.lng
-        ];
-        items.push(stat);
-      })
-      postGroup.items = items;
-      groups.push(postGroup);
-    }
+    $('#courier-list').empty();
+    $('#pickup-list').empty();
+    $('#pickup-map-list').empty();
+    $('#map').empty();
 
-  })
-  console.log('groups', groups);
-
-  ymaps.ready(init);
-
-  function init () {
-    var myMap = new ymaps.Map('map', {
-          center: [
-            50.443705,
-            30.530946
-          ],
-          zoom: 14
-        }),
-        menu = $('<ul class="menu"></ul>');
-    for (var i = 0, l = groups.length; i < l; i++) {
-      createMenuGroup(groups[i]);
-    }
-    function createMenuGroup (group) {
-
-      var menuItem = $('<li><a href="#">' + group.name + '</a></li>');
-      var submenu = $('<ul class="submenu"></ul>');
-      var collection = new ymaps.GeoObjectCollection(null, {preset: group.style});
-
-      myMap.geoObjects.add(collection);
-      myMap.controls.add('zoomControl', { left: 5, top: 5 })
-      menuItem
-        .append(submenu)
-        .appendTo(menu)
-        .find('a')
-        .toggle(function () {
-          myMap.geoObjects.remove(collection);
-          submenu.hide();
-        }, function () {
-          myMap.geoObjects.add(collection);
-          submenu.show();
-        });
-
-      for (var j = 0, m = group.items.length; j < m; j++) {
-        createSubMenu(group.items[j], collection, submenu);
+    var groups = [];
+    var block = this;
+    $.each(parsedResponse.data, function (key, val) {
+      switch (val.type) {
+        case block.deliveryType.courier:
+          var deliveryData = {
+            deliveryId: val.delivery.id,
+            tariffId: val.tariffId,
+            directionId: val.direction,
+            type: block.deliveryType.courier
+          };
+          $('<input/>', {
+            type: 'radio',
+            name: 'tariff',
+            id: 'tariff',
+            onclick: 'DeliveryHandler.addListener.triggerOfferClick(this)',
+            value: val.delivery.name + '-' + val.tariffName + '-' + val.cost + 'р.'
+          }).attr('data-delivery-item', JSON.stringify(deliveryData)).appendTo('#courier-list');
+          $('<label>', {
+            for: 'tariff'
+          }).text(val.delivery.name + '-' + val.tariffName + '-' + val.cost + 'р.').appendTo('#courier-list');
+          break;
+        case block.deliveryType.pickup:
+          groups.push(block._getPickupPointGroup(val, key));
+          break;
+        case block.deliveryType.post:
+          groups.push(block._getPickupPointGroup(val, key));
+          break
       }
+    });
+    $('#delivery-list').show();
+    ymaps.ready(this._initMaps(groups));
+
+  },
+  triggerOfferClick: function (elem) {
+    var jqElem = $(elem);
+    var dataDelivery = JSON.parse(jqElem.attr('data-delivery-item'));
+    $('input[name=delivery_delivery]').val(dataDelivery.deliveryId);
+    $('input[name=delivery_direction]').val(dataDelivery.directionId);
+    $('input[name=delivery_tariff]').val(dataDelivery.tariffId);
+    if (dataDelivery.type == this.deliveryType.pickup) {
+      $('input[name=delivery_pickuppoint]').val(dataDelivery.pickuppointId);
     }
-
-    function createSubMenu (item, collection, submenu) {
-      var submenuItem = $('<li><a href="#">' + item.name + '</a></li>');
-      var placemark = new ymaps.Placemark(item.center, {balloonContent: item.name});
-
-      collection.add(placemark);
-      submenuItem
-        .appendTo(submenu)
-        .find('a')
-        .toggle(function () {
-          placemark.balloon.open();
-        }, function () {
-          placemark.balloon.close();
-        });
-
-      collection.add(placemark);
+    if (dataDelivery.type == this.deliveryType.courier) {
+      $('input[name=delivery_pickuppoint]').val('');
     }
+  },
+  _getPickupPointGroup: function (offer, index) {
+    var ppGroup = {
+      name: offer.delivery.name,
+      style: this.icons[index]
+    };
+    var group = [];
+    $.each(offer.pickupPoints, function (index, stat) {
+      stat.directionId = offer.direction;
+      stat.tariffId = offer.tariffId;
+      stat.center = [
+        stat.lat,
+        stat.lng
+      ];
+      group.push(stat);
+    })
+    ppGroup.items = group;
+    return ppGroup;
+  },
+  _initMaps: function (groups) {
+    this.map = new ymaps.Map('map', {
+      center: [
+        50.443705,
+        30.530946
+      ],
+      zoom: 14
+    });
+    this.menu = $('<ul class="menu"></ul>');
+    for (var i = 0, l = groups.length; i < l; i++) {
+      this._createMenuGroup(groups[i]);
+    }
+    this.menu.appendTo($('#pickup-map-list'));
+    this.map.setBounds(this.map.geoObjects.getBounds());
+  },
+  _createMenuGroup: function (group) {
+    var menuItem = $('<li><a href="#">' + group.name + '</a></li>');
+    var subMenu = $('<ul class="submenu"></ul>');
+    var collection = new ymaps.GeoObjectCollection(null, {preset: group.style});
 
-    menu.appendTo($('#pickup-map-list'));
-    myMap.setBounds(myMap.geoObjects.getBounds());
+    this.map.geoObjects.add(collection);
+    this.map.controls.add('zoomControl', {
+      left: 5,
+      top: 5
+    })
+    var block = this;
+    menuItem
+      .append(subMenu)
+      .appendTo(this.menu)
+      .find('a')
+      .toggle(function () {
+        block.map.geoObjects.remove(collection);
+        subMenu.hide();
+      }, function () {
+        block.map.geoObjects.add(collection);
+        subMenu.show();
+      });
 
+    for (var j = 0, m = group.items.length; j < m; j++) {
+      this._createSubMenuGroup(group.items[j], collection, subMenu);
+    }
+  },
+  _createSubMenuGroup: function (item, collection, subMenu) {
+    var subMenuItem = $('<li><a href="#">' + item.name + '</a></li>');
+    var deliverySettings = {
+      deliveryId: item.delivery_id,
+      directionId: item.directionId,
+      tariffId: item.tariffId,
+      pickuppointId: item.id,
+      type: this.deliveryType.pickup
+    }
+    var placeMark = new ymaps.Placemark(item.center, {
+      balloonContentBody: '<div id="b-content">' + item.name + '</div>'
+                          + '<div class="btn btn-info"  data-delivery-item=' + JSON.stringify(deliverySettings) +
+                          ' onclick=' + 'DeliveryHandler.addListener.triggerOfferClick(this)' + '>Выбрать</div>'
+    });
+    collection.add(placeMark);
+    subMenuItem
+      .appendTo(subMenu)
+      .find('a')
+      .toggle(function () {
+        placeMark.balloon.open();
+      }, function () {
+        placeMark.balloon.close();
+      });
+    collection.add(placeMark);
   }
-
-  deliveryList.show();
 }

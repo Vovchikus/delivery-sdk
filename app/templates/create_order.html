@@ -55,7 +55,6 @@
       <div>Courier</div>
       <div id="courier-list"></div>
       <br/>
-
       <div>Pickup-list</div>
       <div id="pickup-list"></div>
     </div>
@@ -75,11 +74,11 @@
         url: "/searchDeliveryList",
         data: collectData(),
         success: function (response) {
-          deliveryListHandler(response);
+          DeliveryHandler.addListener.processResponse(response);
         }
       });
     });
-
+    //Demo-data
     $('#fill-data').click(function () {
       $('#order_num').val(Math.floor(Math.random() * (99999 - 1 + 1) + 1));
       $('#order_weight').val(2);
@@ -184,18 +183,6 @@
       width: $('input[name=order_width]').val(),
       index_city: $('input[name=deliverypoint_index]').val(),
       sender_id: $( '#sender_id option:selected' ).text()
-    }
-  }
-
-  function triggerInputClick (elem) {
-    var jqElem = $(elem);
-    var dataDelivery = JSON.parse(jqElem.attr('data-delivery-item'));
-    $('input[name=delivery_delivery]').val(dataDelivery.deliveryID);
-    $('input[name=delivery_direction]').val(dataDelivery.directionId);
-    $('input[name=delivery_tariff]').val(dataDelivery.deliveryTariffID);
-    $('input[name=delivery_pickuppoint]').val(dataDelivery.pickuppointID);
-    if (dataDelivery.type == 'PICKUP') {
-      $('input[name=delivery_pickuppoint]').val(dataDelivery.pickuppointID);
     }
   }
 </script>
