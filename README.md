@@ -2,10 +2,15 @@
 
 Настройка компонента:
 1. sudo apt-get install python
+
 2. sudo apt-get install python-pip (Python package manager)
+
 3. sudo pip install virtualenv (виртуальное окружение для работы SDK)
+
 4. install Flask (python lighweight web-framework, http://flask.pocoo.org/docs/0.10/installation/)
+
 5. install Flask-WTForms http://flask-wtf.readthedocs.org/en/latest/install.html - sudo pip install flask-wtf (компонент для работы с формами)
+
 6. sudo pip install flask-bootstrap (компонент для работы с Twitter Bootstrap)
 
 Настройка подключения SDK к Яндекс Доставке.
