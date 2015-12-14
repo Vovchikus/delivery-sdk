@@ -1,4 +1,4 @@
-from flask import render_template, redirect, flash, request
+from flask import render_template, redirect, flash, request, Response
 from app import app
 from forms import InitializationForm, OrderForm
 from app.components import file_helper
@@ -102,3 +102,14 @@ def get_sender_orders():
     get_sender_orders_api = api.get_sender_orders()
     if get_sender_orders_api.status_code == 200:
         return get_sender_orders_api.text
+
+
+@app.route('/getSenderOrderLabel', methods=['GET'])
+def get_sender_order_label():
+    api = open_api_map.OpenApi(request.args)
+    get_sender_order_label_api = api.get_sender_order_label()
+    if get_sender_order_label_api.status_code == 200:
+        import base64, json
+        data_json = json.loads(get_sender_order_label_api.text)
+        base64_data = base64.b64decode(data_json['data'])
+        return Response(base64_data, mimetype='Content-Type: application/pdf')
