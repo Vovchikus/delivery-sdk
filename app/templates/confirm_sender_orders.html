@@ -18,11 +18,32 @@
                       }
                       var ordersList = $("#orders-list");
                       $.each(result.data.orders, function(key, value){
-                        var order = $("<input type='checkbox' name='order'>"+
-                                      "<span class='order-info'> Заказ № " + value.order_id + " - " + value.num + "</span>"+
-                                      "<span class='delivery-info'> Служба " + value.delivery.unique_name + "</span><br />"
-                        );
-                        order.appendTo('#orders-list');
+
+                          var orderItemElem = $('<div>', {
+                               class: 'order-item',
+                               id: value.order_id + '-' + value.num
+                          });
+
+                          var deliveryName = value.delivery.unique_name ? value.delivery.unique_name : "не определена";
+
+                          $('<input/>', {
+                            type: 'checkbox',
+                            name: 'order',
+                            value: value.order_id
+                          }).appendTo(orderItemElem);
+
+                          $('<label>', {
+                            for: 'order'
+                          }).text(value.order_id + '-' + value.num + ', служба ' + deliveryName ).appendTo(orderItemElem);
+
+                          $('<a>', {
+                            class: 'label-link',
+                            id: value.order_id,
+                            href: '/getSenderOrderLabel?order_id=' + value.order_id,
+                          }).text(' Получить ярлык ').appendTo(orderItemElem);
+
+                          orderItemElem.appendTo('#orders-list');
+
                       })
 
                   }

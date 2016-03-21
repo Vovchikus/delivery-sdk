@@ -1,4 +1,3 @@
-import json
 
 
 def make_file(content, file_name, file_ext, mod):

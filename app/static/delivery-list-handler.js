@@ -36,16 +36,25 @@ DeliveryHandler.addListener = {
             directionId: val.direction,
             type: block.deliveryType.courier
           };
+
+          var courierItemElem = $('<div>', {
+               class: 'courier-item'
+           });
+
           $('<input/>', {
             type: 'radio',
             name: 'tariff',
             id: 'tariff',
             onclick: 'DeliveryHandler.addListener.triggerOfferClick(this)',
             value: val.delivery.name + '-' + val.tariffName + '-' + val.cost + 'р.'
-          }).attr('data-delivery-item', JSON.stringify(deliveryData)).appendTo('#courier-list');
+          }).attr('data-delivery-item', JSON.stringify(deliveryData)).appendTo(courierItemElem);
+
           $('<label>', {
             for: 'tariff'
-          }).text(val.delivery.name + '-' + val.tariffName + '-' + val.cost + 'р.').appendTo('#courier-list');
+          }).text(val.delivery.name + '-' + val.tariffName + '-' + val.cost + 'р.').appendTo(courierItemElem);
+
+          courierItemElem.appendTo('#courier-list')
+
           break;
         case block.deliveryType.pickup:
           groups.push(block._getPickupPointGroup(val, key));

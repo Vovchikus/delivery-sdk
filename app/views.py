@@ -22,12 +22,12 @@ def init():
     :return: `Template` object
     """
     form = InitializationForm()
-    exist_resource_settings = file_helper.get_json_from_file('resource_settings')
-    if exist_resource_settings is not None:
+    resource_settings = file_helper.get_json_from_file('resource_settings')
+    if resource_settings is not None:
         form.resource_settings.data = file_helper.get_json_from_file('resource_settings')
 
-    exist_method_keys = file_helper.get_json_from_file('method_keys')
-    if exist_method_keys is not None:
+    method_keys = file_helper.get_json_from_file('method_keys')
+    if method_keys is not None:
         form.method_keys.data = file_helper.get_json_from_file('method_keys')
     if form.validate_on_submit():
         file_helper.make_file(form.method_keys.data, 'method_keys', 'json', 'w+')
@@ -93,7 +93,8 @@ def get_index():
 
 @app.route('/confirmSenderOrders', methods=['GET', 'POST'])
 def confirm_sender_orders():
-    return render_template('confirm_sender_orders.html')
+    api_url = open_api_map.OpenApi.DELIVERY_URL
+    return render_template('confirm_sender_orders.html', api_url=api_url)
 
 
 @app.route('/getSenderOrders', methods=['GET', 'POST'])
