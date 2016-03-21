@@ -14,6 +14,7 @@ DeliveryHandler.addListener = {
   menuGroup: null,
   map: null,
   processResponse: function (response) {
+    var spinner = $("#delivery-list-spinner");
     var parsedResponse = $.parseJSON(response);
     if (parsedResponse.status == 'error') {
       alert(JSON.stringify(parsedResponse));
@@ -30,6 +31,7 @@ DeliveryHandler.addListener = {
     $.each(parsedResponse.data, function (key, val) {
       switch (val.type) {
         case block.deliveryType.courier:
+
           var deliveryData = {
             deliveryId: val.delivery.id,
             tariffId: val.tariffId,
@@ -64,7 +66,7 @@ DeliveryHandler.addListener = {
           break
       }
     });
-    $('#delivery-list').show();
+    spinner.hide();
     ymaps.ready(this._initMaps(groups));
 
   },

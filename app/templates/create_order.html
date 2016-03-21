@@ -10,66 +10,69 @@
 {% from "_formhelpers.html" import render_field %}
 <div id="fill-data" class="btn btn-info">Fill with data</div>
 <form method=post action="/createOrder">
-  <div class="field-row">
-    {{ render_field(form.order_num) }}
-    {{ render_field(form.order_weight) }}
-    {{ render_field(form.order_length) }}
-    {{ render_field(form.order_width) }}
-    {{ render_field(form.order_height) }}
-    {{ render_field(form.order_requisite, class='form-control') }}
-    {{ render_field(form.order_warehouse, class='form-control') }}
-    {{ render_field(form.sender_id, class='form-control') }}
-    {{ render_field(form.order_assessed_value) }}
-    <hr>
-    {{ render_field(form.recipient_first_name) }}
-    {{ render_field(form.recipient_middle_name) }}
-    {{ render_field(form.recipient_last_name) }}
-    {{ render_field(form.recipient_phone) }}
-    {{ render_field(form.recipient_email) }}
-    {{ render_field(form.recipient_comment) }}
-    <hr>
-    {{ render_field(form.deliverypoint_city) }}
-    {{ render_field(form.deliverypoint_street) }}
-    {{ render_field(form.deliverypoint_house) }}
-    {{ render_field(form.deliverypoint_index) }}
+    <div class="field-row">
+        {{ render_field(form.order_num) }}
+        {{ render_field(form.order_weight) }}
+        {{ render_field(form.order_length) }}
+        {{ render_field(form.order_width) }}
+        {{ render_field(form.order_height) }}
+        {{ render_field(form.order_requisite, class='form-control') }}
+        {{ render_field(form.order_warehouse, class='form-control') }}
+        {{ render_field(form.sender_id, class='form-control') }}
+        {{ render_field(form.order_assessed_value) }}
+        <hr>
+        {{ render_field(form.recipient_first_name) }}
+        {{ render_field(form.recipient_middle_name) }}
+        {{ render_field(form.recipient_last_name) }}
+        {{ render_field(form.recipient_phone) }}
+        {{ render_field(form.recipient_email) }}
+        {{ render_field(form.recipient_comment) }}
+        <hr>
+        {{ render_field(form.deliverypoint_city) }}
+        {{ render_field(form.deliverypoint_street) }}
+        {{ render_field(form.deliverypoint_house) }}
+        {{ render_field(form.deliverypoint_index) }}
 
-    {{ render_field(form.to_yd_warehouse) }}
-    {{ render_field(form.is_manual_delivery_cost) }}
+        {{ render_field(form.to_yd_warehouse) }}
+        {{ render_field(form.is_manual_delivery_cost) }}
 
-    {{ render_field(form.order_items) }}
+        {{ render_field(form.order_items) }}
 
-    <hr>
-    <h5>Fill after Search Delivery List</h5>
-    {{ render_field(form.delivery_delivery) }}
-    {{ render_field(form.delivery_direction) }}
-    {{ render_field(form.delivery_pickuppoint) }}
-    {{ render_field(form.delivery_tariff) }}
-    <hr>
+        <hr>
+        <h5>Fill after Search Delivery List</h5>
+        {{ render_field(form.delivery_delivery) }}
+        {{ render_field(form.delivery_direction) }}
+        {{ render_field(form.delivery_pickuppoint) }}
+        {{ render_field(form.delivery_tariff) }}
+        <hr>
 
-    {{ form.csrf_token }}
+        {{ form.csrf_token }}
 
-    <div class="btn btn-info" id="search_delivery">Search Delivery List</div>
+        <div class="btn btn-info" id="search_delivery">Search Delivery List</div>
 
-    <hr>
-    <div id="delivery-list" style="display:none">
-      <div>Courier</div>
-      <div id="courier-list"></div>
-      <br/>
-      <div>Pickup-list</div>
-      <div id="pickup-list"></div>
+        <hr>
+        <img id="delivery-list-spinner" class="image-spinner" src="static/images/spinner.gif">
+        <div id="delivery-list" style="display:none">
+            <div>Courier</div>
+            <div id="courier-list"></div>
+            <br/>
+            <div>Pickup-list</div>
+            <div id="pickup-list"></div>
+        </div>
+        <div id="map" style="width:480px;height:280px;"></div>
+        <div id="pickup-map-list"></div>
+        <p><input type="submit" class="btn btn-primary" value="CreateOrder"></p>
     </div>
-    <div id="map" style="width:480px;height:280px;"></div>
-    <div id="pickup-map-list"></div>
-    <p><input type="submit" class="btn btn-primary" value="CreateOrder"></p>
-  </div>
 </form>
 <hr>
 <div>
-{{create_order}}
+    {{create_order}}
 </div>
 <script>
   $(document).ready(function () {
     $('#search_delivery').click(function () {
+      var spinner = $("#delivery-list-spinner");
+      spinner.show();
       $.ajax({
         url: "/searchDeliveryList",
         data: collectData(),
@@ -185,6 +188,8 @@
       sender_id: $( '#sender_id option:selected' ).text()
     }
   }
+
 </script>
+
 {% endblock %}
 
