@@ -67,6 +67,7 @@ DeliveryHandler.addListener = {
       }
     });
     spinner.hide();
+    $('#delivery-list').show();
     ymaps.ready(this._initMaps(groups));
 
   },

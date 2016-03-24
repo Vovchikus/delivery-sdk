@@ -1,10 +1,52 @@
 {% extends "base.html" %}
+
+{% block scripts %}
+   <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js" ></script>
+{% endblock %}
+
 {% block content %}
+<script>
+  $(function() {
+    $( "#datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+  });
+</script>
+<div>
 <div><a href="/">Main page</a></div>
 <div class="btn btn-info" id="get-sender-orders">Get Orders</div>
+<div class="btn btn-info" id="confirm-sender-orders">ConfirmSenderOrders</div>
+</div>
+<br />
+<p>Выбрать дату отгрузки: <input type="text" id="datepicker"></p>
+<br />
+<select class="form-control" id="shipment-type"><option value="withdraw">Забор</option><option value="import">Самопривоз</option></select>
+<br />
 <div id="orders-list"></div>
 <script>
     $(document).ready(function(){
+
+        $('#confirm-sender-orders').click(function(){
+
+            var orderCheckers = $('input:checkbox[name=order]:checked');
+            var date = $('#datepicker').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+            var shipmentType = $( "#shipment-type option:selected" ).val();
+            var orderIds = [];
+            $.each(orderCheckers, function(index, elem){
+                orderIds.push($(elem).val());
+            })
+
+            if(!date){
+                alert("Необходимо выбрать дату отгрузки для подтверждения");
+                return;
+            }
+
+            if(orderIds.length == 0){
+                alert("Необходимо выбрать заказы для подтверждения");
+                return;
+            }
+
+            confirmSenderOrders(orderIds, date, shipmentType);
+        });
+
         $('#get-sender-orders').click(function(){
             $.ajax({
                   url: "/getSenderOrders",
@@ -50,5 +92,18 @@
                 });
         });
     });
+    function confirmSenderOrders(orderIds, date, shipmentType='withdraw'){
+        var stringifyOrderIds = orderIds.join(',');
+        var data = {order_ids: stringifyOrderIds, shipment_date: date, type: shipmentType}
+
+        $.ajax({
+        url: "/confirm",
+        data: data,
+        success: function (response) {
+          var parsedResponse = $.parseJSON(response);
+          alert(JSON.stringify(parsedResponse));
+        }
+      });
+    }
 </script>
 {% endblock %}

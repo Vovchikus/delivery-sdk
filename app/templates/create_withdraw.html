@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block styles %}
+{{super()}}
+{% endblock %}
+{% block scripts %}
+   <script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js" ></script>
+{% endblock %}
+
+{% block content %}
+<div><a href="/">Main page</a></div>
+<p>{{ get_flashed_messages() }}</p>
+{% from "_formhelpers.html" import render_field %}
+<script>
+  $(function() {
+    $( "#datepicker" ).datepicker({ dateFormat: 'yy-mm-dd' });
+  });
+</script>
+
+<div>
+    <form method=post action="/createWithdraw">
+        <div class="field-row">
+             {{ render_field(form.warehouse_from_id, class='form-control') }}
+             {{ render_field(form.delivery_name) }}
+             {{ render_field(form.datepicker) }}
+
+            <div class="btn btn-info" id="get-intervals">Get Intervals</div>
+            <select class="form-control" id="schedule-select"></select>
+             {{ render_field(form.interval) }}
+             {{ form.csrf_token }}
+            <p><input type="submit" class="btn btn-primary" value="CreateWithdraw"></p>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        $('#get-intervals').click(function(){
+
+            var deliveryName = $('#delivery_name').val();
+            var shipmentDate = $('#datepicker').val();
+            var type = 'withdraw';
+            if(!deliveryName){
+                alert('Необходимо указать название службы доставки');
+                return;
+            }
+            if(!shipmentDate){
+                alert('Необходимо указать дату забора');
+                return;
+            }
+
+            var data = {delivery_name: deliveryName, shipment_date: shipmentDate, shipment_type: type}
+            var scheduleSelect = $('#schedule-select');
+
+            $.ajax({
+                url: "/getIntervals",
+                data: data,
+                success: function (response) {
+                    scheduleSelect.empty();
+                    var parsedResponse = $.parseJSON(response);
+                    if (parsedResponse.status == 'error') {
+                        alert(JSON.stringify(parsedResponse));
+                        return;
+                    }
+
+                    $.each(parsedResponse.data.schedules, function(key, value){
+                        var newOption = $("<option></option>").val(value.id).text(value.schedule.from + '-' + value.schedule.to);
+                        scheduleSelect.append(newOption);
+                    });
+                    scheduleSelect.show();
+                }
+            });
+        });
+
+        $('#schedule-select').on('change', function(event){
+            $('#interval').val($(this).val());
+        })
+
+    });
+</script>
+
+{% endblock %}

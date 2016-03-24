@@ -3,7 +3,6 @@ from wtforms import StringField, SelectField, BooleanField, FormField, FieldList
 from order_item import OrderItemsForm
 
 
-
 class OrderForm(Form):
     order_num = StringField("Order Num")
     order_weight = StringField("Order Weight")
@@ -31,6 +30,3 @@ class OrderForm(Form):
     is_manual_delivery_cost = BooleanField("Use Custom Delivery Cost")
     order_items = FieldList(FormField(OrderItemsForm), min_entries=1)
     sender_id = SelectField("Order Sender", coerce=str)
-
-
-

@@ -1,6 +1,6 @@
 from flask import render_template, redirect, flash, request, Response
 from app import app
-from forms import InitializationForm, OrderForm
+from forms import InitializationForm, OrderForm, WithdrawForm
 from app.components import file_helper
 from app.components.open_api import open_api_map
 
@@ -97,6 +97,17 @@ def confirm_sender_orders():
     return render_template('confirm_sender_orders.html', api_url=api_url)
 
 
+@app.route('/confirm', methods=['GET', 'POST'])
+def confirm():
+    """
+    :return: string
+    """
+    api = open_api_map.OpenApi(request.args)
+    confirm_orders_call = api.confirm_sender_orders()
+    if confirm_orders_call.status_code == 200:
+        return confirm_orders_call.text
+
+
 @app.route('/getSenderOrders', methods=['GET', 'POST'])
 def get_sender_orders():
     api = open_api_map.OpenApi(request.args)
@@ -105,12 +116,31 @@ def get_sender_orders():
         return get_sender_orders_api.text
 
 
+@app.route('/getIntervals', methods=['GET', 'POST'])
+def get_intervals():
+    api = open_api_map.OpenApi(request.args)
+    intervals = api.get_intervals()
+    if intervals.status_code == 200:
+        return intervals.text
+
+
 @app.route('/getSenderOrderLabel', methods=['GET'])
 def get_sender_order_label():
     api = open_api_map.OpenApi(request.args)
     get_sender_order_label_api = api.get_sender_order_label()
     if get_sender_order_label_api.status_code == 200:
         import base64, json
-        data_json = json.loads(get_sender_order_label_api.text)
-        base64_data = base64.b64decode(data_json['data'])
-        return Response(base64_data, mimetype='Content-Type: application/pdf')
+        try:
+            data_json = json.loads(get_sender_order_label_api.text)
+            base64_data = base64.b64decode(data_json['data'])
+            return Response(base64_data, mimetype='Content-Type: application/pdf')
+        except TypeError:
+            return Response("Unable to load labels", 400)
+
+
+@app.route('/createWithdraw', methods=['GET'])
+def create_withdraw():
+    settings = file_helper.get_json_from_file('resource_settings')
+    form = WithdrawForm()
+    form.warehouse_from_id.choices = [(w, w) for w in settings['warehouse_ids']]
+    return render_template('create_withdraw.html', form=form)

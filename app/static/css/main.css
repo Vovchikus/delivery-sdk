@@ -42,3 +42,6 @@ form {
   z-index: 100;
   display: none;
 }
+#schedule-select{
+    display: none;
+}
